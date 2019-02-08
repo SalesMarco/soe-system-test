@@ -1,0 +1,476 @@
+import java.net.MalformedURLException;
+
+import java.util.Scanner;
+import java.net.URL;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Random;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.remote.DesiredCapabilities;
+
+
+import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.MobileElement;
+import io.appium.java_client.TouchAction;
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.android.nativekey.AndroidKey;
+import io.appium.java_client.android.nativekey.KeyEvent;
+import io.appium.java_client.touch.WaitOptions;
+import io.appium.java_client.touch.offset.PointOption;
+
+public class SOEFirstTest {
+	
+	public static AppiumDriver<MobileElement> driver = null;
+	
+	@SuppressWarnings("rawtypes")
+	public static void main(String[] args) {
+		
+		String guia;
+		String caja;
+		String dealer;
+		String contenedor;
+		
+		Scanner reader = new Scanner(System.in);  // Reading from System.in
+		System.out.println("Inserte guía: ");
+		guia = reader.nextLine(); 
+		
+		System.out.println("Inserte caja: ");
+		caja = reader.nextLine(); 
+		
+		System.out.println("Inserte dealer: ");
+		dealer = reader.nextLine(); 
+		
+		System.out.println("Inserte contenedor: ");
+		contenedor = reader.nextLine(); // Scans the next token of the input as an int.
+
+		//once finished
+		reader.close();
+		
+		setUp("15181521650512","4.4.3","com.mobile.estafeta","com.outsystems.android.SplashScreen");
+		
+		//LoginController loginController = LoginController.getInstance(driver);
+		
+		TouchAction action = new TouchAction(driver);
+		
+		/* Si la pantalla de login está disponible, entonces haz las operaciones correspondientes a ella */
+		
+		/*if(loginController != null) {
+			loginController.init("//android.widget.EditText[@instance=1]", "//android.widget.Button[@content-desc='Entrar']", 
+					"//android.widget.Button[@content-desc=\"Supervisor\"]", "//android.widget.Button[@content-desc=\"Limpiar\"]");
+			//Código que habilita el escaneo del dispositivo
+		
+			moverTouchHacia(action,479,428,152,428);
+			presionarTouch(action,219,445);
+			moverTouchHacia(action,152,428,479,428);
+			
+			loginController.contrasenia.sendKeys("0300");
+			loginController.botonEntrar.click();
+			driver.findElement(By.id("button1")).click();
+			loginController.reset();
+		}*/
+		
+		esperarCarga(5000);
+	
+		CargaController cargaController = CargaController.getInstance(driver);
+		
+		if(cargaController != null) {
+			cargaController.init("//android.widget.Button[@content-desc='Carga ']");
+			cargaController.botonCarga.click();
+			cargaController.reset();
+		}
+		
+		RegistroContenedorController registroContenedorController = RegistroContenedorController.getInstance(driver);
+		
+		if(registroContenedorController != null) {
+			registroContenedorController.init("//android.widget.EditText[@instance=0]", "//android.widget.EditText[@instance=1]", "//android.widget.EditText[@instance=2]",
+					"//android.widget.Button[@content-desc=\"Seleccione una nave...\"]", "//android.widget.Button[@content-desc=\"Seleccione una ruta...\"]", "//android.widget.Button[@content-desc=\"Aceptar\"]");
+		
+		
+			registroContenedorController.contenedor1.sendKeys(contenedor);
+			//registroContenedorController.contenedor2.sendKeys("C22EM4321");
+			driver.hideKeyboard();
+		
+			//registroContenedorController.botonListaCheckIn.click();
+			
+			//esperarCarga(5000);
+			
+			//registroContenedorController.botonRuta.click();
+			//esperarCarga(7000);
+		
+			//registroContenedorController.botonAceptar.click();
+			esperarCarga(10000);
+			registroContenedorController.reset();
+		}
+		
+		//esperarCarga(3000);
+		
+		OpcionesController opcionesController = OpcionesController.getInstance(driver);
+		
+		if(opcionesController != null) {
+			opcionesController.init("//android.widget.Button[@content-desc=\"ECON \"]","//android.widget.Button[@content-desc=\"manifiesto\"]","//android.widget.Button[@content-desc=\"Rebastecimiento\"]");
+			opcionesController.botonECON.click();
+			opcionesController.reset();
+		}
+		
+		esperarCarga(3000);
+		
+		
+		ArrayList<String> cajasDanadas = null;
+		
+		ManifiestoECONController manifiestoECONController = ManifiestoECONController.getInstance(driver);
+		if(manifiestoECONController != null) {
+			manifiestoECONController.init("//android.widget.EditText[@instance=0]","//android.widget.EditText[@instance=1]","//android.widget.EditText[@instance=2]",
+					"//android.widget.Button[@content-desc=\"Aceptar\"]","//android.widget.Button[@content-desc=\"Guardar\"]");
+			//manifiestoECONController.insertar(1);
+			manifiestoECONController.campoGuia.sendKeys(guia);
+			manifiestoECONController.campoConcesionario.sendKeys(dealer);
+			driver.hideKeyboard();
+			manifiestoECONController.campoCaja.sendKeys(caja);
+			driver.hideKeyboard();
+			manifiestoECONController.botonAceptar.click();
+			manifiestoECONController.botonGuardar.click();
+			manifiestoECONController.botonSi = manifiestoECONController.initElement("//android.widget.Button[@content-desc=\"Si\"]");
+			manifiestoECONController.botonNo = manifiestoECONController.initElement("//android.widget.Button[@content-desc=\"no\"]");
+			//manifiestoECONController.botonCancelar = manifiestoECONController.initElement("//android.widget.Button[@content-desc=\"Cancelar\"]");
+			
+			//Si se deseara continuar sin cajas dañadas esta sección se quitaría y se pondría 
+			manifiestoECONController.botonNo.click();
+			 
+			
+			/*manifiestoECONController.botonSi.click();
+			cajasDanadas = new ArrayList<String>(manifiestoECONController.cajas);
+			Collections.shuffle(cajasDanadas);*/
+			manifiestoECONController.reset();
+		}
+		
+		//esperarCarga(3000);
+		
+		/* En esta parte se insertan cajas dañadas de prueba, así como las fotos de la evidencia */
+		
+		/*for (int i = 0; i < new Random().nextInt(cajasDanadas.size()) + 1 ; i++){
+			
+			CajasDanadasController cajasDanadasController = CajasDanadasController.getInstance(driver);
+			if(cajasDanadasController != null) {
+				cajasDanadasController.init("//android.widget.EditText[@instance=0]", "//android.widget.Button[@content-desc=\"Aceptar \"]", "//android.widget.Button[@content-desc=\"Ir a autorizar\"]");
+				cajasDanadasController.numeroCaja.sendKeys(cajasDanadas.get(i));
+				cajasDanadasController.botonAceptar.click();
+				cajasDanadasController.botonConfirmarAceptar = cajasDanadasController.initElement("//android.widget.Button[@instance=1]");
+				cajasDanadasController.botonConfirmarCancelar = cajasDanadasController.initElement("//android.widget.Button[@instance=0]");
+				cajasDanadasController.botonConfirmarAceptar.click();
+				cajasDanadasController.reset();
+			}
+				
+			FotoController fotoController;
+			
+			for(int j = 0; j < new Random().nextInt(5) + 1; j++) {
+				
+				fotoController = FotoController.getInstance(driver);
+				if(fotoController != null) {
+					fotoController.init("//android.widget.Button[@instance=0]", "ACEPTAR FOTO", "//android.widget.Button[@instance=1]");
+				}
+					
+				
+				fotoController.botonTomarFoto.click();
+				fotoController.reset();
+					
+				CamaraController camaraController = CamaraController.getInstance(driver);
+				if(camaraController != null) {
+					camaraController.init("com.android.camera2:id/shutter_button");
+					camaraController.botonCapturar.click();
+					camaraController.botonAceptar = camaraController.initElement("com.android.camera2:id/btn_done");
+					camaraController.botonAceptar.click();
+					camaraController.reset();
+				}
+				
+				fotoController = FotoController.getInstance(driver);
+				if(fotoController != null) 
+					fotoController.init("//android.widget.Button[@instance=0]", "ACEPTAR FOTO", "//android.widget.Button[@instance=1]");
+				
+				
+				fotoController.botonAceptarFoto.click();
+				fotoController.reset();
+										
+			}
+			
+			fotoController = FotoController.getInstance(driver);
+			if(fotoController != null) {
+				scrollDown();
+				esperarCarga(10000);
+				driver.getPageSource();
+				fotoController.init("//android.widget.Button[@instance=0]", "ACEPTAR FOTO", "//android.widget.Button[@instance=1]");
+				fotoController.botonTerminar.click();
+				//System.out.println("Everything goes my way");
+			}
+			
+			ComentarioController comentarioController = ComentarioController.getInstance(driver);
+			
+			if(comentarioController != null) {
+				comentarioController.init("//android.widget.EditText[@instance=0]", "//android.widget.Button[@content-desc=\"Guardar\"]");
+				comentarioController.comentarioText.sendKeys("Comentario de prueba");
+				comentarioController.botonGuardar.click();
+				comentarioController.reset();
+			}
+			
+		}
+		
+		CajasDanadasController cajasDanadasController = CajasDanadasController.getInstance(driver);
+		if(cajasDanadasController != null) {
+			cajasDanadasController.init("//android.widget.EditText[@instance=0]", "//android.widget.Button[@content-desc=\"Aceptar \"]", "//android.widget.Button[@content-desc=\"Ir a autorizar\"]");
+			cajasDanadasController.botonAutorizar.click();
+		}*/
+		
+		AutorizacionController autorizacionController = AutorizacionController.getInstance(driver);
+		if(autorizacionController != null) {
+			autorizacionController.init("//android.widget.EditText[@instance=0]", "//android.widget.EditText[@instance=1]", "//android.widget.EditText[@instance=2]", "//android.widget.Button[@content-desc=\"Agregar firma\"]", "//android.widget.Button[@content-desc=\"Autorizar\"]");
+			autorizacionController.nombre.click();
+			esperarCarga(2000);
+			
+			
+			((AndroidDriver)driver).pressKey(new KeyEvent(AndroidKey.E));
+			((AndroidDriver)driver).pressKey(new KeyEvent(AndroidKey.F));
+			//((AndroidDriver)driver).pressKey(new KeyEvent(AndroidKey.R));
+			//((AndroidDriver)driver).pressKey(new KeyEvent(AndroidKey.E));
+			//((AndroidDriver)driver).pressKey(new KeyEvent(AndroidKey.N));
+
+			driver.hideKeyboard();
+			
+			autorizacionController.apellido.click();
+			esperarCarga(2000);
+			
+			((AndroidDriver)driver).pressKey(new KeyEvent(AndroidKey.C));
+			((AndroidDriver)driver).pressKey(new KeyEvent(AndroidKey.A));
+			((AndroidDriver)driver).pressKey(new KeyEvent(AndroidKey.R));
+		//	((AndroidDriver)driver).pressKey(new KeyEvent(AndroidKey.R));
+			//((AndroidDriver)driver).pressKey(new KeyEvent(AndroidKey.I));
+			//((AndroidDriver)driver).pressKey(new KeyEvent(AndroidKey.L));
+			//((AndroidDriver)driver).pressKey(new KeyEvent(AndroidKey.L));
+			//((AndroidDriver)driver).pressKey(new KeyEvent(AndroidKey.O));
+			driver.hideKeyboard();
+			
+			autorizacionController.agregarFirmaBoton.click();
+		
+			
+			FirmaController firmaController = FirmaController.getInstance(driver);
+				
+			if(firmaController != null) {
+				esperarCarga(3000);
+				driver.getPageSource();
+				moverTouchHacia(action,196,186,196,75);
+				esperarCarga(3000);
+				driver.getPageSource();
+				firmaController.init("//android.view.View[@instance=13]", "//android.view.View[@content-desc=\"NUEVA FIRMA\"]", "//android.view.View[@content-desc=\"CONFIRMAR\"]");
+				moverTouchHacia(action,278,206,522,313);
+				moverTouchHacia(action,522,206,278,313);
+				firmaController.confirmarBoton.click();
+				firmaController.reset();
+			}
+			
+			autorizacionController.autorizarBoton.click();
+			driver.findElement(By.id("button1")).click();
+			
+		}
+		
+		ImprimirManifiestoController imprimirManifiestoController = ImprimirManifiestoController.getInstance(driver);
+		
+		if(imprimirManifiestoController != null) {
+			imprimirManifiestoController.init("//android.widget.CheckBox[@instance=0]","//android.widget.CheckBox[@instance=1]", "//android.widget.Button[@instance=0]", "//android.widget.Button[@instance=1]");
+			imprimirManifiestoController.cancelarBoton.click();
+			driver.findElement(By.id("button1")).click();
+			imprimirManifiestoController.reset();
+		}
+		
+		opcionesController = OpcionesController.getInstance(driver);
+		
+		if(opcionesController != null) {
+			opcionesController.init("//android.widget.Button[@content-desc=\"ECON \"]","//android.widget.Button[@content-desc=\"manifiesto\"]","//android.widget.Button[@content-desc=\"Rebastecimiento\"]");
+			opcionesController.botonManifesto.click();
+			opcionesController.reset();
+		}
+		
+		ManifiestoEntregaController manifiestoEntregaController = ManifiestoEntregaController.getInstance(driver);
+		
+		if(manifiestoEntregaController != null) {
+			manifiestoEntregaController.init("//android.widget.Button[@content-desc=\"Recolecciones\"]", "//android.widget.Button[@content-desc=\"Entrega\"]");
+			manifiestoEntregaController.botonEntrega.click();
+			manifiestoEntregaController.reset();
+		}
+		
+		EntradaConcesionarioController entradaConcesionarioController = EntradaConcesionarioController.getInstance(driver);
+		
+		if(entradaConcesionarioController != null) {
+			entradaConcesionarioController.init("//android.widget.EditText[@instance=0]", "//android.widget.Button[@instance=0]", "//android.widget.Button[@instance=1]");
+			entradaConcesionarioController.concesionarioEditText.sendKeys(dealer);
+			entradaConcesionarioController.botonContinuar.click();
+			entradaConcesionarioController.reset();
+		}
+		
+		EntregaConcesionarioController entregaConcesionarioController = EntregaConcesionarioController.getInstance(driver);
+		
+		if(entregaConcesionarioController != null) {
+			entregaConcesionarioController.init("//android.widget.EditText[@instance=0]", "//android.widget.Button[@content-desc=\"Aceptar\"]", "//android.widget.Button[@content-desc=\"Entregar\"]");
+			entregaConcesionarioController.guiaEditText.sendKeys(guia);
+			driver.hideKeyboard();
+			entregaConcesionarioController.botonAceptar.click();
+			entregaConcesionarioController.botonEntregar.click();
+			entregaConcesionarioController.botonNo = entregaConcesionarioController.initElement("//android.widget.Button[@content-desc=\"no\"]");
+			entregaConcesionarioController.botonNo.click();
+			entregaConcesionarioController.reset();
+		}
+		
+		autorizacionController = AutorizacionController.getInstance(driver);
+		if(autorizacionController != null) {
+			autorizacionController.init("//android.widget.EditText[@instance=0]", "//android.widget.EditText[@instance=1]", "//android.widget.EditText[@instance=2]", "//android.widget.Button[@content-desc=\"Agregar firma\"]", "//android.widget.Button[@content-desc=\"Aceptar\"]");
+			autorizacionController.nombre.click();
+			esperarCarga(2000);
+			
+			
+			((AndroidDriver)driver).pressKey(new KeyEvent(AndroidKey.E));
+			((AndroidDriver)driver).pressKey(new KeyEvent(AndroidKey.F));
+			//((AndroidDriver)driver).pressKey(new KeyEvent(AndroidKey.R));
+			//((AndroidDriver)driver).pressKey(new KeyEvent(AndroidKey.E));
+			//((AndroidDriver)driver).pressKey(new KeyEvent(AndroidKey.N));
+			
+			driver.hideKeyboard();
+			
+			autorizacionController.apellido.click();
+			esperarCarga(2000);
+			
+			((AndroidDriver)driver).pressKey(new KeyEvent(AndroidKey.C));
+			((AndroidDriver)driver).pressKey(new KeyEvent(AndroidKey.A));
+			((AndroidDriver)driver).pressKey(new KeyEvent(AndroidKey.R));
+			//((AndroidDriver)driver).pressKey(new KeyEvent(AndroidKey.R));
+			//((AndroidDriver)driver).pressKey(new KeyEvent(AndroidKey.I));
+			//((AndroidDriver)driver).pressKey(new KeyEvent(AndroidKey.L));
+			//((AndroidDriver)driver).pressKey(new KeyEvent(AndroidKey.L));
+			//((AndroidDriver)driver).pressKey(new KeyEvent(AndroidKey.O));
+			driver.hideKeyboard();
+			
+			autorizacionController.agregarFirmaBoton.click();
+		
+			
+			FirmaController firmaController = FirmaController.getInstance(driver);
+				
+			if(firmaController != null) {
+				esperarCarga(3000);
+				driver.getPageSource();
+				moverTouchHacia(action,196,186,196,75);
+				esperarCarga(3000);
+				driver.getPageSource();
+				firmaController.init("//android.view.View[@instance=13]", "//android.view.View[@content-desc=\"NUEVA FIRMA\"]", "//android.view.View[@content-desc=\"CONFIRMAR\"]");
+				moverTouchHacia(action,278,206,522,313);
+				moverTouchHacia(action,522,206,278,313);
+				firmaController.confirmarBoton.click();
+				firmaController.reset();
+			}
+			
+			autorizacionController.autorizarBoton.click();
+			//driver.findElement(By.id("button1")).click();
+			
+		}
+		
+		SalidaConcesionarioController salidaConcesionarioController = SalidaConcesionarioController.getInstance(driver);
+		
+		if(salidaConcesionarioController != null) {
+			salidaConcesionarioController.init("//android.widget.EditText[@instance=0]", "//android.widget.Button[@instance=0]");
+			salidaConcesionarioController.concesionarioEditText.sendKeys(dealer);
+			salidaConcesionarioController.botonContinuar.click();
+			salidaConcesionarioController.reset();
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		    
+			
+			
+			
+			
+		
+		
+		
+		
+		
+		
+	}
+	
+	public static void setUp(String udid,String androidVersion,String appPackage, String appActivity) {
+		
+		//Set the Desired Capabilities
+				DesiredCapabilities caps = new DesiredCapabilities();
+				caps.setCapability("deviceName", "My Phone");
+				caps.setCapability("udid", udid); //adb devices
+				caps.setCapability("platformName", "Android");
+				caps.setCapability("platformVersion", androidVersion);
+				caps.setCapability("appPackage", appPackage);
+				caps.setCapability("appActivity", appActivity);
+				caps.setCapability("noReset", "true");
+				//Instantiate Appium Driver
+				try {
+					driver = new AndroidDriver<MobileElement>(new URL("http://0.0.0.0:4723/wd/hub"), caps);
+				} catch (MalformedURLException e) {
+					System.out.println(e.getMessage());
+				}
+				//Added 10 seconds wait so that the app loads completely before starting with element identification
+				try {
+					Thread.sleep(11000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+		
+	}
+
+	@SuppressWarnings("rawtypes")
+	public static void presionarTouch(TouchAction action,int x1,int y1) {
+		action.press(PointOption.point(x1,y1))
+			.waitAction(WaitOptions.waitOptions(Duration.ofMillis(1000)))
+			.release()
+			.perform();
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public static void moverTouchHacia(TouchAction action, int x1, int y1, int x2, int y2) {
+		action.press(PointOption.point(x1,y1))
+			.waitAction(WaitOptions.waitOptions(Duration.ofMillis(1000)))
+			.moveTo(PointOption.point(x2,y2))
+			.release()
+			.perform();
+	}
+	
+	public static void esperarCarga(int milisec) {
+		try {
+			Thread.sleep(milisec);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public static void scrollDown()  {
+
+	    //The viewing size of the device
+	    Dimension size = driver.manage().window().getSize();
+
+	    //x position set to mid-screen horizontally
+	    int width = size.width / 2;
+
+	    //Starting y location set to 80% of the height (near bottom)
+	    int startPoint = (int) (size.getHeight() * 0.80);
+
+	    //Ending y location set to 1% of the height (almost top)
+	    int endPoint = (int) (size.getHeight() * 0.01);
+
+	    new TouchAction(driver).press(PointOption.point(width, startPoint)).waitAction(WaitOptions.waitOptions(Duration.ofMillis(2000))).moveTo(PointOption.point(width, endPoint)).release().perform();
+
+	}
+
+}
